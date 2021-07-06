@@ -1,49 +1,68 @@
 import 'package:flutter/material.dart';
+import './questao.dart';
+import './resposta.dart';
+import './resultado.dart';
 
 main() => runApp(new PerguntaApp());
 
 class _PerguntaAppState extends State<PerguntaApp> {
-  var _perguntaSelecionada = 0;
+  var _indicePerguntaSelecionada = 0;
+  final List<Map<String, Object>> _perguntas = const [
+    {
+      'texto': 'Qual é a sua cor favorita?',
+      'resposta': ['Preto', 'Vermelho', 'Rosa', 'Azul']
+    },
+    {
+      'texto': 'Qual é o seu animal favorito?',
+      'resposta': ['Cachorro', 'gato', 'peixe', 'pássaro']
+    },
+    {
+      'texto': 'Qual o físico mais famoso?',
+      'resposta': ['Einsten', 'Galileu', 'Corpénico', 'Newton']
+    },
+  ];
 
   void _responder() {
-    setState(() {
-      _perguntaSelecionada++;
-    });
-    _print(_perguntaSelecionada);
+    if (temPerguntaSelecionada) {
+      setState(() {
+        _indicePerguntaSelecionada++;
+      });
+    }
+  }
+
+  bool get temPerguntaSelecionada {
+    return _indicePerguntaSelecionada < _perguntas.length;
   }
 
   @override
   Widget build(BuildContext context) {
-    final perguntas = [
-      'Qual é a sua cor favorita?',
-      'Qual é o seu animal favorito?',
-    ];
+//declarativa
+    List<String> respostas = temPerguntaSelecionada
+        ? _perguntas[_indicePerguntaSelecionada].cast()['resposta']
+        : [];
+
+    //imperativo
+    // List<Widget> respostas = [];
+    // for (String textoResp
+    //     in perguntas[_perguntaSelecionada].cast()['resposta']) {
+    //   respostas.add(Resposta(textoResp, _responder));
+    //   print(textoResp);
+    // }
 
     return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Perguntas'),
-        ),
-        body: Column(
-          children: <Widget>[
-            Center(child: Text(perguntas[_perguntaSelecionada])),
-            ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    primary: Colors.red,
-                    onSurface: Colors.green,
-                    elevation: 20,
-                    shadowColor: Colors.red),
-                child: Text('Resposta 1'),
-                onPressed: _responder),
-            ElevatedButton(child: Text('Resposta 2'), onPressed: _responder),
-            ElevatedButton(child: Text('Resposta 3'), onPressed: _responder),
-          ],
-        ),
-      ),
+          appBar: AppBar(
+            title: Text('Perguntas'),
+          ),
+          body: temPerguntaSelecionada
+              ? Column(
+                  children: <Widget>[
+                    Questao(_perguntas[_indicePerguntaSelecionada]['texto']
+                        .toString()),
+                    ...respostas.map((t) => Resposta(t, _responder)).toList(),
+                  ],
+                )
+              : Resultado()),
     );
   }
 }
